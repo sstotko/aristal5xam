@@ -1,0 +1,29 @@
+# This playbook is to be used to generate leaf tenant configuration
+---
+- hosts: leafs_DC2
+  gather_facts: no
+  tasks:
+    - name: "Import underlay variables"
+      include_vars:
+        file: "{{ lookup('env','PWD') }}/vars/underlay.yml"
+        name: underlay
+    - name: "Import tenant variables"
+      include_vars:
+        file: "{{ lookup('env','PWD') }}/vars/tenants.yml"
+        name: tenants
+    - name: "crate configuration from leaf tenant template"
+      template:
+        src: ../templates/tenants.j2
+        dest: "{{ lookup('env','PWD') }}/configs/{{ inventory_hostname }}_tenants.cfg"
+
+# Use the eos_config module to create a task to upload the configuration you created to the switch
+# Deploy configuration straight from template.
+# Alternative would be src: "../configs{{ inventory_hostname }}_tenants.cfg"
+    - name: "Deploy EOS configurations"
+      arista.eos.eos_config:
+        backup: yes
+        backup_options:
+          dir_path: "{{ lookup('env','PWD') }}/backups/"
+          filename: "{{ inventory_hostname }}.cfg"
+        save_when: changed
+        src: "{{ lookup('env','PWD') }}/templates/tenants.j2"

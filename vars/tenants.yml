@@ -1,0 +1,23 @@
+Red:
+  L3VNI: 10000
+  L2Networks:
+    DMZ:
+      l2vnid: 10001
+      VLAN: 101
+      IRB_IP: "10.10.10.1/24"
+    Internal:
+      l2vnid: 10002
+      VLAN: 102
+      IRB_IP: "10.10.20.1/24"
+
+Blue:
+  L3VNI: 20000
+  L2Networks:
+    DMZ:
+      l2vnid: 20001
+      VLAN: 201
+      IRB_IP: "10.20.10.1/24"
+    Internal:
+      l2vnid: 20002
+      VLAN: 202
+      IRB_IP: "10.20.20.1/24"

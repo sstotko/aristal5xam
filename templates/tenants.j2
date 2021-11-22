@@ -1,0 +1,32 @@
+interface vxlan1
+  vxlan source-interface Loopback1
+  vxlan udp-port 4789
+{% for tenant in tenants %}
+  vxlan vrf {{ tenant }} vni {{ tenants[tenant]['L3VNI'] }}
+{% for l2vrf in tenants[tenant]['L2Networks'] %}
+  vxlan vlan {{ tenants[tenant]['L2Networks'][l2vrf]['VLAN'] }} vni {{ tenants[tenant]['L2Networks'][l2vrf]['l2vnid'] }}
+{% endfor %}
+{% endfor %}
+
+
+router bgp {{ underlay[inventory_hostname]['BGP']['ASN'] }}
+{% for tenant in tenants %}
+  vrf {{ tenant }}
+    rd {{ underlay[inventory_hostname]['interfaces']['loopback0']['ipv4'] }}:{{ tenants[tenant]['L3VNI'] }}
+    route-target import evpn {{ tenants[tenant]['L3VNI'] }}:{{ tenants[tenant]['L3VNI'] }}
+    route-target export evpn {{ tenants[tenant]['L3VNI'] }}:{{ tenants[tenant]['L3VNI'] }}
+
+{% for l2vrf in tenants[tenant]['L2Networks'] %}
+  vlan {{ tenants[tenant]['L2Networks'][l2vrf]['VLAN'] }}
+    rd auto
+    route-target both {{ tenants[tenant]['L2Networks'][l2vrf]['l2vnid'] }}:{{ tenants[tenant]['L2Networks'][l2vrf]['l2vnid'] }}
+    redistribute learned
+{% endfor %}
+{% endfor %}
+
+{% for tenant in tenants %}
+{% for l2vrf in tenants[tenant]['L2Networks'] %}
+interface vlan {{ tenants[tenant]['L2Networks'][l2vrf]['VLAN'] }}
+  ip address virtual {{ tenants[tenant]['L2Networks'][l2vrf]['IRB_IP'] }}
+{% endfor %}
+{% endfor %}

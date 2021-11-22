@@ -1,0 +1,48 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: "Import variables"
+      include_vars:
+        file: ./vars/underlay.yml
+        name: underlay
+    - name: "test interface template"
+      template:
+        src: ./templates/interfaces.j2
+        dest: "./configs/{{ inventory_hostname }}_interfaces.cfg"
+
+- hosts: leafs_DC2
+  gather_facts: false
+  tags:
+    - leaf
+  tasks:
+    - name: "Import underlay variables"
+      include_vars:
+        file: ./vars/underlay.yml
+        name: underlay
+    - name: "Import tenant variables"
+      include_vars:
+        file: ./vars/tenants.yml
+        name: tenants
+    - name: "test leaf template"
+      template:
+        src: ./templates/leaf.j2
+        dest: "./configs/{{ inventory_hostname }}_leaf.cfg"
+    - name: "test leaf tenant template"
+      template:
+        src: ./templates/tenants.j2
+        dest: "./configs/{{ inventory_hostname }}_tenants.cfg"
+
+- hosts: spines_DC2
+  gather_facts: false
+  tags:
+    - spine
+  tasks:
+    - name: "Import variables"
+      include_vars:
+        file: ./vars/underlay.yml
+        name: underlay
+    - name: "test spine template"
+      template:
+        src: ./templates/spine.j2
+        dest: "./configs/{{ inventory_hostname }}_spine.cfg"

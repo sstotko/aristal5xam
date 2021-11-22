@@ -1,0 +1,11 @@
+{# Use a for loop to configure all interfaces listed in underlay.yml #}
+{# If the interface is an Ethernet interface, use MTU of 9214 and make sure to include "no switchport" #}
+{# The exam lab guide explicitly says "Do not increase the MTU on peer interfaces." #}
+{% for interface in underlay[inventory_hostname]['interfaces'] %}
+interface {{ interface }}
+{% if underlay[inventory_hostname]['interfaces'][interface]['mask'] != 32 %}
+   no switchport
+   mtu 9214
+{% endif %}
+   ip address {{ underlay[inventory_hostname]['interfaces'][interface]['ipv4'] }}/{{ underlay[inventory_hostname]['interfaces'][interface]['mask'] }}
+{% endfor %}
