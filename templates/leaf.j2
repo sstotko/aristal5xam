@@ -1,10 +1,12 @@
 {# This is the leaf template #}
-
 {# MLAG #}
 spanning-tree mode mstp
+
 no spanning-tree vlan-id 4094                                      
+
 vlan 4094
    trunk group MLAGPEER
+
 interface Vlan4094
    description MLAG PEER LINK
    {% if underlay[inventory_hostname]['MLAG'] == "Odd" %}
@@ -12,18 +14,22 @@ interface Vlan4094
    {% else %}
    ip address 192.168.255.2/30
    {% endif %}
+
 interface Port-Channel10
    description MLAG PEER LINK - LEAF
    switchport mode trunk
    switchport trunk group MLAGPEER
+
 interface Ethernet1
    description MLAG PEER LINK - LEAF
    switchport mode trunk
    channel-group 10 mode active
+
 interface Ethernet2
    description MLAG PEER LINK - LEAF
    switchport mode trunk
    channel-group 10 mode active
+
 mlag configuration
    domain-id MLAG
    local-interface Vlan4094
@@ -79,7 +85,7 @@ router bgp {{ underlay[inventory_hostname]['BGP']['ASN'] }}
 {# This is a conditional (if statements), if the switch is "Odd" the neighbor is 192.168.255.2, if it's even the neighbor is 192.168.255.1 #}
 {% if underlay[inventory_hostname]['MLAG'] == "Odd" %}
   neighbor 192.168.255.2 peer group LEAF_Peer
-{% else %}
+{% elif underlay[inventory_hostname]['MLAG'] == "Even" %}
   neighbor 192.168.255.1 peer group LEAF_Peer
 {% endif %}
 

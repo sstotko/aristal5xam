@@ -1,0 +1,14 @@
+router bgp {{ underlay[inventory_hostname]['BGP']['ASN'] }}
+   neighbor EVPN-OVERLAY-PEERS peer-group
+   neighbor EVPN-OVERLAY-PEERS remote-as {{ underlay['global']['DC2']['spine_ASN'] }}
+   neighbor EVPN-OVERLAY-PEERS update-source Loopback0
+   neighbor EVPN-OVERLAY-PEERS ebgp-multihop 3
+   neighbor EVPN-OVERLAY-PEERS send-community
+   neighbor EVPN-OVERLAY-PEERS maximum-routes 0
+
+{% for spinepeer in overlay['global']['DC2']['spine_loopback0'] %}
+   neighbor {{ spinepeer }} peer group EVPN-OVERLAY-PEERS
+{% endfor %}
+
+  address-family evpn
+     neighbor EVPN-OVERLAY-PEERS activate

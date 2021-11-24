@@ -25,8 +25,17 @@ router bgp {{ underlay[inventory_hostname]['BGP']['ASN'] }}
 {% endfor %}
 
 {% for tenant in tenants %}
+vrf instance {{ tenant }}
+ip routing vrf {{ tenant }}
 {% for l2vrf in tenants[tenant]['L2Networks'] %}
+
+vlan {{ tenants[tenant]['L2Networks'][l2vrf]['VLAN'] }}
+  name {{ tenant }}-{{ l2vrf }}
+
 interface vlan {{ tenants[tenant]['L2Networks'][l2vrf]['VLAN'] }}
+  vrf {{ tenant }}
   ip address virtual {{ tenants[tenant]['L2Networks'][l2vrf]['IRB_IP'] }}
+{# force VLAN up for testing #}
+  no autostate
 {% endfor %}
 {% endfor %}

@@ -27,12 +27,20 @@ router bgp {{ underlay[inventory_hostname]['BGP']['ASN'] }}
    distance bgp 20 200 200
 
 {# Modified the listen ranges to be able to separate underlay and overlay peer groups #}
+  bgp listen range 10.2.0.0/24 peer-group EVPN-OVERLAY-PEERS peer-filter LEAF-AS-RANGE
   bgp listen range 10.2.2.0/24 peer-group LEAF_Underlay peer-filter LEAF-AS-RANGE
+  neighbor EVPN-OVERLAY-PEERS peer-group
+  neighbor EVPN-OVERLAY-PEERS ebgp-multihop 3
+  neighbor EVPN-OVERLAY-PEERS send-community
+  neighbor EVPN-OVERLAY-PEERS maximum-routes 0 
   neighbor LEAF_Underlay peer group
   neighbor LEAF_Underlay send-community
   neighbor LEAF_Underlay maximum-routes 12000
   redistribute connected route-map LOOPBACK
-
+  !
+  address-family evpn
+     neighbor EVPN-OVERLAY-PEERS activate
+   !
   address-family ipv4
     neighbor LEAF_Underlay activate
     redistribute connected route-map LOOPBACK

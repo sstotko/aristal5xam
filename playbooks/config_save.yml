@@ -1,0 +1,10 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: "Save running-config on all switches"
+      arista.eos.eos_config:
+        backup: yes
+        backup_options:
+          dir_path: "{{ lookup('env', 'PWD') }}/backups/"
+          filename: "{{ inventory_hostname }}.cfg"
+        save_when: always

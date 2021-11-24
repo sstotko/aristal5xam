@@ -5,21 +5,21 @@
 - hosts: all
   gather_facts: no
   tasks:
-  - name: Register variables (candidates- Do not change this)
-    include_vars:
-      file: "{{ lookup('env','PWD') }}/vars/underlay.yml"
-      name: underlay
-  - name: Create template
-    template:
-      src: "{{ lookup('env','PWD') }}/templates/interfaces.j2"
-      dest: "{{ lookup('env','PWD') }}/configs/{{inventory_hostname}}_interface.cfg"
-# Use the eos_config module to create a task to upload the configuration you created to the switch
-
-  - name: "Deploy EOS configurations"
-    arista.eos.eos_config:
-      backup: yes
-      backup_options:
-        dir_path: "{{ lookup('env', 'PWD') }}/backups/"
-        filename: "{{ inventory_hostname }}.cfg"
-      save_when: changed
-      src: "{{ lookup('env', 'PWD') }}/templates/interfaces.j2"
+    - name: Register variables (candidates- Do not change this)
+      include_vars:
+        file: "{{ lookup('env','PWD') }}/vars/underlay.yml"
+        name: underlay
+    - name: Create template
+      template:
+        src: "{{ lookup('env','PWD') }}/templates/interfaces.j2"
+        dest: "{{ lookup('env','PWD') }}/configs/{{inventory_hostname}}_interfaces.cfg"
+  # Use the eos_config module to create a task to upload the configuration you created to the switch
+  
+    - name: "Deploy EOS configurations"
+      arista.eos.eos_config:
+        backup: yes
+        backup_options:
+          dir_path: "{{ lookup('env', 'PWD') }}/backups/"
+          filename: "{{ inventory_hostname }}.cfg"
+        save_when: changed
+        src: "{{ lookup('env', 'PWD') }}/templates/interfaces.j2"

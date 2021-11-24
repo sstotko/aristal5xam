@@ -20,6 +20,10 @@
       include_vars:
         file: ./vars/underlay.yml
         name: underlay
+    - name: "Import overlay variables"
+      include_vars:
+        file: ./vars/overlay.yml
+        name: overlay
     - name: "Import tenant variables"
       include_vars:
         file: ./vars/tenants.yml
@@ -27,7 +31,11 @@
     - name: "test leaf template"
       template:
         src: ./templates/leaf.j2
-        dest: "./configs/{{ inventory_hostname }}_leaf.cfg"
+        dest: "./configs/{{ inventory_hostname }}_underlay.cfg"
+    - name: "test leaf overlay template"
+      template:
+        src: ./templates/leaf_overlay.j2
+        dest: "./configs/{{ inventory_hostname }}_overlay.cfg"
     - name: "test leaf tenant template"
       template:
         src: ./templates/tenants.j2
@@ -38,11 +46,19 @@
   tags:
     - spine
   tasks:
-    - name: "Import variables"
+    - name: "Import underlay variables"
       include_vars:
         file: ./vars/underlay.yml
         name: underlay
-    - name: "test spine template"
+    - name: "Import overlay variables"
+      include_vars:
+        file: ./vars/overlay.yml
+        name: overlay
+    - name: "test spine underlay template"
       template:
         src: ./templates/spine.j2
-        dest: "./configs/{{ inventory_hostname }}_spine.cfg"
+        dest: "./configs/{{ inventory_hostname }}_underlay.cfg"
+    - name: "test spine overlay template"
+      template:
+        src: ./templates/spine_overlay.j2
+        dest: "./configs/{{ inventory_hostname }}_overlay.cfg"
